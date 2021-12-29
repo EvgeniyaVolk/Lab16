@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 namespace Lab16._1
 {
@@ -10,76 +12,51 @@ namespace Lab16._1
     {
         static void Main(string[] args)
         {
-            Products[] products = new Products[5];
+            const int n = 5;
+            Products[] products = new Products[n];
 
-            for (int i = 0; i < 5; i++)
-
+            for (int i = 0; i < n; i++)
             {
-                products[i] = new Products();
-               
-                Console.Write("Код товара {0}", products[i].Code);
-                Console.Write("Название товара {0}", products[i].Name);
-                Console.WriteLine("Цена товара {0}", products[i].Price);
+                Console.WriteLine("Введите код товара");
+                int code = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Введите наименование товара");
+                string name = Console.ReadLine();
+                Console.WriteLine("Введите стоимость товара");
+                double prise = Convert.ToDouble(Console.ReadLine());
+                products[i] = new Products() { Code = code, Name = name, Price = prise };
             }
+
+            JsonSerializerOptions options = new JsonSerializerOptions()
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+                WriteIndented = true
+            };
+            string jsonProducts = JsonSerializer.Serialize(products, options);
+            string productsJson = "D:/Папка/Product.json";
+
+            //*Проверяем, существует ли файл, если нет, то создаем его
+
+            if (!File.Exists(productsJson))
+            {
+                File.Create(productsJson);
+            }
+
+            //*Записываем в файл json-строку
+
+            using (StreamWriter sw = new StreamWriter(productsJson))
+            {
+                sw.WriteLine(jsonProducts);
+                sw.Close();
+            }
+
+            Console.WriteLine(jsonProducts);
             Console.ReadKey();
 
         }
 
     }
 
-    public class Products
-
-    {
-        public int Code { get; set; }
-        public string Name { get; set; }
-        public double Price { get; set; }
-
-
-
-        public int GetCode
-         {
-             get
-             {
-                 Console.Write("Code: ");
-                 int code = Convert.ToInt32(Console.ReadLine());
-                 code = Code;
-                 return Code;
-             }
-             set
-             {
-                 Code = value;
-             }
-         }
-         public string GetName
-         {
-             get
-             {
-                 Console.Write("Name: ");
-                 string name = Console.ReadLine();
-                 name = Name;
-                 return Name;
-             }
-             set
-             {
-                 Name = value;
-             }
-         }
-         public double GetPrice
-         {
-             get
-             {
-                 Console.Write("Price: ");
-                 double price = Convert.ToInt32(Console.ReadLine());
-                 price = Price;
-                 return Price;
-             }
-             set
-             {
-                 Price = value;
-             }
-         }
-
-    }
+   
 
 
 
